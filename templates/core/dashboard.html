@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Aviator Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/core/css/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Aviator Results</h1>
+
+      <form id="result-form">
+        <label>Round ID: <input name="round_id" /></label>
+        <label>Multiplier: <input name="multiplier" type="number" step="0.01" required /></label>
+        <button type="submit">Add Result</button>
+      </form>
+
+      <section id="suggestion">
+        <h2>AI Suggestion</h2>
+        <div id="suggestion-body">Loading...</div>
+      </section>
+
+      <canvas id="chart" width="800" height="300"></canvas>
+    </div>
+
+    <script src="/static/core/js/dashboard.js"></script>
+  </body>
+</html>
