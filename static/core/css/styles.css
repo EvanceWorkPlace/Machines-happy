@@ -1,0 +1,4 @@
+body { font-family: Arial, sans-serif; margin: 20px; }
+.container { max-width: 1000px; margin: auto; }
+form label { margin-right: 10px; }
+#suggestion { margin-top: 20px; padding: 10px; background: #f8f8f8; border: 1px solid #ddd; }
