@@ -1,9 +1,4 @@
-django>=4.2
-djangorestframework>=3.14
-langchain>=0.0.287
-openai>=1.0
-pandas>=2.0
-numpy>=1.25
-psycopg2-binary>=2.9
-django-extensions>=3.2
-jupyter>=1.0
+tensorflow
+scikit-learn
+numpy
+pandas
