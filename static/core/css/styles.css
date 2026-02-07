@@ -1,4 +1,57 @@
-body { font-family: Arial, sans-serif; margin: 20px; }
-.container { max-width: 1000px; margin: auto; }
-form label { margin-right: 10px; }
-#suggestion { margin-top: 20px; padding: 10px; background: #f8f8f8; border: 1px solid #ddd; }
+ body {
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: #e5e7eb;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 30px auto;
+        background: #020617;
+        padding: 20px;
+        border-radius: 10px;
+      }
+
+      h1, h2 {
+        margin-bottom: 10px;
+      }
+
+      form {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      input, button {
+        padding: 8px;
+        border-radius: 6px;
+        border: none;
+      }
+
+      input {
+        flex: 1;
+      }
+
+      button {
+        background: #22c55e;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      #suggestion {
+        margin: 20px 0;
+        padding: 15px;
+        border-radius: 8px;
+        background: #020617;
+        border: 1px solid #1e293b;
+      }
+
+      .LOW { color: #22c55e; }
+      .MEDIUM { color: #facc15; }
+      .HIGH { color: #ef4444; }
+
+      canvas {
+        margin-top: 20px;
+        background: #020617;
+        border-radius: 8px;
+      }

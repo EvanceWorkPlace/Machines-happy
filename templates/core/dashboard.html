@@ -1,29 +1,61 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Aviator Dashboard</title>
+    <title>Aviator Sequence Analyzer</title>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <link rel="stylesheet" href="/static/core/css/styles.css" />
+
+    <style>
+     
+    </style>
   </head>
+
   <body>
     <div class="container">
-      <h1>Aviator Results</h1>
+      <h1>Aviator Result Analyzer</h1>
+      <p style="opacity:0.8">
+        Educational sequence & volatility analysis (not a prediction system)
+      </p>
 
+      <!-- INPUT FORM -->
       <form id="result-form">
-        <label>Round ID: <input name="round_id" /></label>
-        <label>Multiplier: <input name="multiplier" type="number" step="0.01" required /></label>
-        <button type="submit">Add Result</button>
+        <input
+          name="round_id"
+          placeholder="Round ID (optional)"
+        />
+        <input
+          name="multiplier"
+          type="number"
+          step="0.01"
+          min="1"
+          placeholder="Multiplier (e.g. 2.15)"
+          required
+        />
+        <button type="submit">Add</button>
+        <a href="/api/export/" style="color:#22c55e;font-weight:bold">
+  ⬇ Export CSV for ML
+</a>
+
       </form>
 
+      <!-- AI SUGGESTION -->
       <section id="suggestion">
-        <h2>AI Suggestion</h2>
-        <div id="suggestion-body">Loading...</div>
+        <h2>Analysis</h2>
+        <div id="suggestion-body">
+          Waiting for data...
+        </div>
       </section>
 
-      <canvas id="chart" width="800" height="300"></canvas>
+      <!-- CHART -->
+      <canvas id="chart" height="280"></canvas>
+      <h2 style="margin-top:30px">Volatility Heatmap</h2>
+      <canvas id="heatmap" height="120"></canvas>
+
     </div>
 
-    <script src="/static/core/js/dashboard.js"></script>
+    
   </body>
 </html>

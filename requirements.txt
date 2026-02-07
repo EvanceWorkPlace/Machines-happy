@@ -5,3 +5,5 @@ openai>=1.0
 pandas>=2.0
 numpy>=1.25
 psycopg2-binary>=2.9
+django-extensions>=3.2
+jupyter>=1.0
