@@ -1,10 +1,20 @@
 from django.urls import path
-from . import views
+from .views import (
+    dashboard,
+    StatsAPIView,
+    CrashResultListCreate,
+    PredictAPIView,
+    CheckPredictionAPIView,
+    VolatilityHeatmapView,
+    
+)
 
 urlpatterns = [
-    path('', views.dashboard, name='dashboard'),
-    path("api/export/", views.export_csv, name="export_csv"),
-    path("api/volatility-heatmap/", views.VolatilityHeatmapView.as_view(), name="volatility_heatmap"),
-    path('api/results/', views.CrashResultListCreate.as_view(), name='results_api'),
-    path('api/suggestion/', views.SuggestionView.as_view(), name='suggestion_api'),
+    path("", dashboard),
+    path("api/results/", CrashResultListCreate.as_view()),
+    path("api/predict/", PredictAPIView.as_view()),
+    path("api/stats/", StatsAPIView.as_view()),
+    path("api/check/", CheckPredictionAPIView.as_view()),
+    path("api/volatility-heatmap/", VolatilityHeatmapView.as_view()),
+
 ]

@@ -57,8 +57,9 @@ class LSTMPredictor(BasePredictor):
         super().__init__(window_size)
         self.model = None
         self.model_path = os.path.join(settings.BASE_DIR, 'models', 'lstm_model.h5')
-        
-    def build_model(self, input_shape: Tuple[int, int]) -> Sequential:
+    
+
+    def build_model(self, input_shape: Tuple[int, int]):
         """Build LSTM model architecture"""
         if not TENSORFLOW_AVAILABLE:
             raise RuntimeError("TensorFlow is not available. Install with: pip install tensorflow")
@@ -175,7 +176,6 @@ class LSTMPredictor(BasePredictor):
             self.is_trained = True
             return True
         return False
-
 
 class RandomForestPredictor(BasePredictor):
     """Random Forest-based predictor for pattern recognition"""
@@ -400,3 +400,34 @@ class EnsemblePredictor(BasePredictor):
             results['lstm'] = self.lstm_pred.load_model()
         results['rf'] = self.rf_pred.load_model()
         return results
+
+# ==========================================
+# SIMPLE SERVICE USED BY DASHBOARD
+# ==========================================
+
+class AviatorPredictionService:
+    """
+    Lightweight service for dashboard usage.
+    Uses RandomForest only (fast & safe).
+    """
+
+    def __init__(self):
+        self.predictor = RandomForestPredictor(window_size=20)
+        self.predictor.load_model()
+
+    def predict_next(self, values: list):
+        if len(values) < 25:
+            return {
+                "prediction": None,
+                "volatility": "UNKNOWN",
+                "confidence": 0.0,
+                "error": "Not enough data"
+            }
+
+        result = self.predictor.predict(values)
+
+        return {
+            "prediction": result["predicted_value"],
+            "volatility": result["volatility"],
+            "confidence": result["confidence"],
+        }

@@ -1,188 +1,103 @@
+const form = document.getElementById("input-form");
+const predictedSpan = document.getElementById("predictedValue");
+const volatilitySpan = document.getElementById("volatility");
+const confidenceSpan = document.getElementById("confidence");
+const historyList = document.getElementById("historyList");
 
-  const form = document.getElementById("result-form");
-  const suggestionBody = document.getElementById("suggestion-body");
-  const ctx = document.getElementById("chart").getContext("2d");
+let lastPrediction = null;
 
-  let chart;
-  const WINDOW = 10;
+// SUBMIT CURRENT VALUE
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-  function rollingStats(data, window) {
-    const mean = [];
-    const upper = [];
-    const lower = [];
+  const input = document.getElementById("currentValue");
+  const value = parseFloat(input.value);
 
-    for (let i = 0; i < data.length; i++) {
-      if (i < window - 1) {
-        mean.push(null);
-        upper.push(null);
-        lower.push(null);
-        continue;
-      }
+  if (isNaN(value)) return;
 
-      const slice = data.slice(i - window + 1, i + 1);
-      const avg = slice.reduce((a, b) => a + b, 0) / slice.length;
-
-      const variance =
-        slice.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / slice.length;
-      const std = Math.sqrt(variance);
-
-      mean.push(avg);
-      upper.push(avg + std);
-      lower.push(avg - std);
-    }
-
-    return { mean, upper, lower };
-  }
-
-  async function fetchResults() {
-    const res = await fetch("/api/results/");
-    return await res.json();
-  }
-
-  async function fetchSuggestion() {
-    const res = await fetch("/api/suggestion/");
-    return await res.json();
-  }
-
-  async function renderChart() {
-    const results = await fetchResults();
-    const values = results.map(r => r.multiplier);
-    const labels = values.map((_, i) => i + 1);
-
-    const stats = rollingStats(values, WINDOW);
-
-    if (chart) chart.destroy();
-
-    chart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels,
-        datasets: [
-          {
-            label: "Multiplier",
-            data: values,
-            borderWidth: 2,
-            tension: 0.3
-          },
-          {
-            label: "Rolling Mean",
-            data: stats.mean,
-            borderDash: [5, 5],
-            borderWidth: 2
-          },
-          {
-            label: "Upper Volatility Band",
-            data: stats.upper,
-            borderWidth: 1,
-            borderDash: [2, 2]
-          },
-          {
-            label: "Lower Volatility Band",
-            data: stats.lower,
-            borderWidth: 1,
-            borderDash: [2, 2]
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { position: "top" }
-        },
-        scales: {
-          x: {
-            title: { display: true, text: "Sequence Order" }
-          },
-          y: {
-            title: { display: true, text: "Multiplier" }
-          }
-        }
-      }
-    });
-  }
-
-  async function renderSuggestion() {
-    const data = await fetchSuggestion();
-    if (data.streaks?.length) {
-      suggestionBody.innerHTML += `
-        <p><strong>Detected Patterns:</strong></p>
-        <ul>
-          ${data.streaks.map(s =>
-            `<li>${s.type} (${s.length})</li>`
-          ).join("")}
-        </ul>
-      `;
-  }  
-}
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    await fetch("/api/results/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        round_id: form.round_id.value,
-        multiplier: parseFloat(form.multiplier.value)
-      })
-    });
-
-    form.reset();
-    renderChart();
-    renderSuggestion();
+  const res = await fetch("/api/predict/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ multiplier: value })
   });
 
-  renderChart();
-  renderSuggestion();
+  const data = await res.json();
 
-
-  const heatCtx = document.getElementById("heatmap").getContext("2d");
-  let heatChart;
-
-  async function renderHeatmap() {
-    const res = await fetch("/api/volatility-heatmap/");
-    const data = await res.json();
-
-    const values = data.volatility;
-    const labels = values.map((_, i) => i + 1);
-
-    const colors = values.map(v => {
-      if (v === null) return "rgba(100,100,100,0.3)";
-      if (v < 0.5) return "rgba(34,197,94,0.8)";     // low
-      if (v < 1.5) return "rgba(250,204,21,0.8)";    // medium
-      return "rgba(239,68,68,0.8)";                  // high
-    });
-
-    if (heatChart) heatChart.destroy();
-
-    heatChart = new Chart(heatCtx, {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [{
-          label: "Volatility (Std Dev)",
-          data: values,
-          backgroundColor: colors
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          x: { display: false },
-          y: { title: { display: true, text: "σ" } }
-        }
-      }
-    });
+  if (data.predicted_value !== null) {
+    predictedSpan.innerText = data.predicted_value.toFixed(2);
+    confidenceSpan.innerText = data.confidence;
+  } else {
+    predictedSpan.innerText = "waiting for the data";
   }
 
-  // hook into existing refresh cycle
-  const oldRenderChart = renderChart;
-  renderChart = async function () {
-    await oldRenderChart();
-    await renderHeatmap();
-  };
+  volatilitySpan.innerText = data.volatility;
 
-  renderHeatmap();
+  lastPrediction = data.predicted_value;
+
+  input.value = "";
+  document.getElementById("result-check").style.display = "block";
+});
+
+
+// CHECK ACTUAL RESULT
+document.getElementById("checkBtn").addEventListener("click", async () => {
+  const actualInput = document.getElementById("actualValue");
+  const actual = parseFloat(actualInput.value);
+
+  if (isNaN(actual) || lastPrediction === null) return;
+
+  const res = await fetch("/api/check/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      predicted: lastPrediction,
+      actual: actual
+    })
+  });
+  async function loadStats() {
+  const res = await fetch("/api/stats/");
+  const data = await res.json();
+
+  document.getElementById("accuracy").innerText = data.accuracy;
+  document.getElementById("streak").innerText = data.streak;
+  document.getElementById("streakType").innerText = data.streak_type || "—";
+  }
+
+  loadStats();
+  
+  const data = await res.json();
+
+  // ADD TO HISTORY LIST
+  const li = document.createElement("li");
+  li.className = "list-group-item";
+  li.innerHTML = `
+    ⏱ ${data.time} |
+    Pred: ${data.predicted.toFixed(2)} →
+    Actual: ${data.actual.toFixed(2)} |
+    <strong>${data.status}</strong>
+  `;
+  historyList.prepend(li);
+
+  document.getElementById("resultStatus").innerText =
+    `${data.status} (Δ ${data.difference})`;
+
+  // CLEAR INPUTS
+  actualInput.value = "";
+  async function loadChart() {
+  const res = await fetch("/api/chart/");
+  const d = await res.json();
+
+  new Chart(document.getElementById("predictionChart"), {
+    type: "line",
+    data: {
+      labels: d.labels,
+      datasets: [
+        { label: "Predicted", data: d.predicted, borderWidth: 2 },
+        { label: "Actual", data: d.actual, borderWidth: 2 }
+      ]
+    }
+  });
+}
+});
+
+

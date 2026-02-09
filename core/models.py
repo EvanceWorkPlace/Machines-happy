@@ -18,3 +18,11 @@ class CrashResult(models.Model):
 
     def __str__(self):
         return f"{self.multiplier}"
+
+class PredictionCheck(models.Model):
+    predicted = models.FloatField()
+    actual = models.FloatField()
+    difference = models.FloatField()
+    status = models.CharField(max_length=10)
+    created_at = models.DateTimeField(auto_now_add=True)
+

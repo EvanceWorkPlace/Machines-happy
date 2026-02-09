@@ -1,61 +1,57 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Aviator Sequence Analyzer</title>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Aviator Predictor</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/static/core/css/styles.css" />
+</head>
+<body>
+<div class="container">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <h1>Aviator Prediction Dashboard</h1>
 
-    <link rel="stylesheet" href="/static/core/css/styles.css" />
+  <!-- INPUT -->
+  <form id="input-form">
+    <label>
+      Current Multiplier:
+      <input type="number" step="0.01" id="currentValue" required />
+    </label>
+    <button type="submit">Submit</button>
+  </form>
 
-    <style>
-     
-    </style>
-  </head>
-
-  <body>
-    <div class="container">
-      <h1>Aviator Result Analyzer</h1>
-      <p style="opacity:0.8">
-        Educational sequence & volatility analysis (not a prediction system)
-      </p>
-
-      <!-- INPUT FORM -->
-      <form id="result-form">
-        <input
-          name="round_id"
-          placeholder="Round ID (optional)"
-        />
-        <input
-          name="multiplier"
-          type="number"
-          step="0.01"
-          min="1"
-          placeholder="Multiplier (e.g. 2.15)"
-          required
-        />
-        <button type="submit">Add</button>
-        <a href="/api/export/" style="color:#22c55e;font-weight:bold">
-  ⬇ Export CSV for ML
-</a>
-
-      </form>
-
-      <!-- AI SUGGESTION -->
-      <section id="suggestion">
-        <h2>Analysis</h2>
-        <div id="suggestion-body">
-          Waiting for data...
-        </div>
-      </section>
-
-      <!-- CHART -->
-      <canvas id="chart" height="280"></canvas>
-      <h2 style="margin-top:30px">Volatility Heatmap</h2>
-      <canvas id="heatmap" height="120"></canvas>
-
-    </div>
-
+  <!-- PREDICTION -->
+  <section id="prediction">
+    <h2>Next Prediction</h2>
+    <p><strong>Predicted Value:</strong> <span id="predictedValue">—</span></p>
+    <p><strong>Volatility:</strong> <span id="volatility">—</span></p>
+    <p><strong>Confidence:</strong> <span id="confidence">—</span></p>
     
-  </body>
+  </section>
+
+  <!-- RESULT CHECK -->
+  <section id="result-check" style="display:none;">
+    <h2>Check Prediction</h2>
+    <label>
+      Actual Next Value:
+      <input type="number" step="0.01" id="actualValue" />
+    </label>
+    <button id="checkBtn">Check</button>
+    <p id="resultStatus"></p>
+  </section>
+  
+    <h4>Prediction History</h4>
+    <ul id="historyList" class="list-group mt-2"></ul>
+  <canvas id="chart" height="150"></canvas>
+    <div class="card mt-3 p-3">
+  <h5>Performance</h5>
+  <p>Accuracy: <strong><span id="accuracy">0</span>%</strong></p>
+  <p>Streak: <strong><span id="streak">0</span></strong>
+     (<span id="streakType">—</span>)</p>
+</div>
+
+</div>
+
+<script src="/static/core/js/dashboard.js"></script>
+</body>
 </html>
